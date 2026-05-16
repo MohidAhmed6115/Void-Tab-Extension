@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<!-- saved from url=(0067)file:///C:/Users/Admin/Desktop/HTML/VoidTab%20Extension/newtab.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoidTab</title>
+  <link rel="icon" type="image/png" href="icons/icon128.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link href="./newtab_files/css2" rel="stylesheet">
+  <link rel="stylesheet" href="./newtab_files/newtab.css">
+  <style>
+    /* Prevent browser from showing any bottom bar / page label */
+    html, body { background: #000 !important; }
+    body::after { content: none !important; display: none !important; }
+    /* Wallpaper upload area */
+    #upload-wallpaper-area {
+      display: flex; align-items: center; gap: 10px; margin-top: 4px;
+    }
+    #wallpaper-upload-btn {
+      padding: 7px 14px !important;
+      border-radius: 8px !important;
+      border: 1px solid rgba(255,255,255,0.20) !important;
+      background: rgba(255,255,255,0.10) !important;
+      color: rgba(255,255,255,0.90) !important;
+      font-size: 12px !important;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    #wallpaper-upload-btn:hover {
+      background: rgba(255,255,255,0.18) !important;
+      border-color: rgba(255,255,255,0.35) !important;
+      color: #fff !important;
+    }
+    #upload-filename {
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Wallpaper Layer -->
+  <div id="wallpaper-bg"></div>
+  <div id="wallpaper-overlay"></div>
+
+  <!-- Top Board Tabs -->
+  <header id="board-tabs-bar">
+    <div id="board-tabs-list"></div>
+    <button id="add-board-btn" title="New Board">+</button>
+  </header>
+
+  <!-- Main Content: Bookmark Groups Grid -->
+  <main id="main-grid"></main>
+
+  <!-- Bottom Left: Wallpaper Picker -->
+  <button id="wallpaper-btn" title="Change Wallpaper">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle>
+      <polyline points="21 15 16 10 5 21"></polyline>
+    </svg>
+  </button>
+
+  <!-- Right Sidebar Icons -->
+  <aside id="right-sidebar">
+    <button class="sidebar-btn" id="btn-search" title="Search Boards &amp; Bookmarks">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </button>
+    <button class="sidebar-btn" id="btn-bulk-import" title="Bulk Import Bookmarks">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line>
+      </svg>
+    </button>
+    <button class="sidebar-btn" id="btn-incognito" title="Open Links in Incognito">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
+        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+      </svg>
+    </button>
+    <button class="sidebar-btn" id="btn-multiselect" title="Select Multiple Bookmarks">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+    </button>
+    <button class="sidebar-btn" id="btn-trash" title="Trash Bin">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14H6L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path>
+        <path d="M9 6V4h6v2"></path>
+      </svg>
+    </button>
+    <button class="sidebar-btn" id="btn-privacy" title="Toggle Privacy Blur">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>
+      </svg>
+    </button>
+    <button class="sidebar-btn" id="btn-settings" title="Settings">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+      </svg>
+    </button>
+    <button class="sidebar-btn" id="btn-edit-mode" title="Toggle Edit Mode">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"></path>
+        <path d="M14.06 4.94l3.75 3.75"></path>
+      </svg>
+    </button>
+  </aside>
+
+  <!-- AI Floating Button -->
+  <button id="ai-fab" title="AI Coach">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2a10 10 0 1 0 10 10"></path><path d="M12 6v6l4 2"></path><circle cx="19" cy="5" r="3" fill="currentColor" stroke="none"></circle>
+    </svg>
+  </button>
+
+  <!-- AI Chat Panel -->
+  <div id="ai-panel" class="">
+    <div id="ai-panel-header">
+      <span>AI Coach</span>
+      <button id="ai-panel-close">✕</button>
+    </div>
+    <div id="ai-messages"></div>
+    <div id="ai-input-row">
+      <input id="ai-input" type="text" placeholder="Ask your coach..." autocomplete="off">
+      <button id="ai-send">→</button>
+    </div>
+  </div>
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="modal hidden">
+    <div class="modal-box">
+      <input id="search-input" type="text" placeholder="Search bookmarks and boards..." autocomplete="off">
+      <div id="search-results"></div>
+    </div>
+  </div>
+
+  <!-- Bulk Import Modal -->
+  <div id="bulk-modal" class="modal hidden">
+    <div class="modal-box">
+      <h3>Bulk Import Bookmarks</h3>
+      <p>Paste one URL per line. AI will suggest groups.</p>
+      <textarea id="bulk-textarea" placeholder="https://github.com
+https://youtube.com
+https://claude.ai"></textarea>
+      <div id="bulk-actions">
+        <button id="bulk-analyze-btn">Analyze with AI</button>
+        <button class="modal-close-btn">Cancel</button>
+      </div>
+      <div id="bulk-results"></div>
+    </div>
+  </div>
+
+  <!-- Trash Modal -->
+  <div id="trash-modal" class="modal hidden">
+    <div class="modal-box">
+      <h3>Trash Bin</h3>
+      <div id="trash-list"></div>
+      <div id="trash-actions">
+        <button id="empty-trash-btn">Empty Trash</button>
+        <button class="modal-close-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-box">
+      <h3>Settings</h3>
+      <label>Anthropic API Key (for AI Coach)
+        <input id="api-key-input" type="password" placeholder="sk-ant-...">
+      </label>
+      <label>Theme
+        <select id="theme-select">
+          <option value="auto">Auto (System)</option>
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+        </select>
+      </label>
+      <label>Card Effect
+        <div id="card-effect-select">
+          <button class="effect-btn active" data-effect="transparent">✦ Transparent</button>
+          <button class="effect-btn" data-effect="frosted">❄ Frosted</button>
+          <button class="effect-btn" data-effect="ghost">👻 Ghost</button>
+          <button class="effect-btn" data-effect="neon-glow">⚡ Neon Glow</button>
+          <button class="effect-btn" data-effect="smoke">🌫 Smoke</button>
+          <button class="effect-btn" data-effect="aurora">🌌 Aurora</button>
+          <button class="effect-btn" data-effect="matte-dark">◼ Matte Dark</button>
+        </div>
+      </label>
+      <div id="settings-actions">
+        <button id="save-settings-btn">Save</button>
+        <button class="modal-close-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Group Modal -->
+  <div id="add-group-modal" class="modal hidden">
+    <div class="modal-box">
+      <h3>New Group</h3>
+      <label>Group Name <input id="new-group-name" type="text" placeholder="e.g. Design"></label>
+      <div id="add-group-actions">
+        <button id="confirm-add-group-btn">Create</button>
+        <button class="modal-close-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wallpaper Modal -->
+  <div id="wallpaper-modal" class="modal hidden">
+    <div class="modal-box">
+      <h3>Change Wallpaper</h3>
+      <label>Upload Image from Device
+        <div id="upload-wallpaper-area">
+          <input type="file" id="wallpaper-file-input" accept="image/*" style="display:none">
+          <button type="button" id="wallpaper-upload-btn">📁 Choose Image File</button>
+          <span id="upload-filename">No file chosen</span>
+        </div>
+      </label>
+      <label>Or paste Image URL
+        <input id="custom-wallpaper-input" type="text" placeholder="https://...">
+      </label>
+      <div>
+        <button id="apply-wallpaper-btn">Apply</button>
+        <button class="modal-close-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div id="context-menu" class="hidden">
+    <button class="ctx-item" id="ctx-open">Open</button>
+    <button class="ctx-item" id="ctx-open-incognito">Open in Incognito</button>
+    <button class="ctx-item" id="ctx-edit">Edit</button>
+    <button class="ctx-item" id="ctx-delete">Delete</button>
+  </div>
+
+  <script src="./newtab_files/newtab.js"></script>
+  <script src="./newtab_files/ai.js"></script>
+
+
+</body></html>
