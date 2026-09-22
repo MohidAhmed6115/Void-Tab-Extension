@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "VoidTab",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Your personal productivity new tab — bookmark boards, tab grouping, and AI coaching.",
   "chrome_url_overrides": {
     "newtab": "newtab.html"
@@ -10,7 +10,8 @@
     "tabs",
     "storage",
     "tabGroups",
-    "bookmarks"
+    "bookmarks",
+    "search"
   ],
   "background": {
     "service_worker": "js/background.js"

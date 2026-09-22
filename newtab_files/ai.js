@@ -89,7 +89,7 @@ window.aiChat = async function(userMessage) {
   const apiKey = window._voidtabState?.apiKey;
 
   if (!apiKey) {
-    window.appendAIMsg('assistant', '⚠ No API key set. Go to Settings (⚙) and add your Anthropic API key to enable AI coaching.');
+    window.appendAIMsg('assistant', 'No API key set. Open Settings and add your Anthropic API key to enable AI coaching.');
     return;
   }
 
@@ -214,7 +214,7 @@ async function checkTabsOnLoad() {
     if (!msgs) return;
     const div = document.createElement('div');
     div.className = 'ai-msg assistant';
-    div.textContent = `⚡ ${distractions.length} distraction tab${distractions.length > 1 ? 's' : ''} detected (${distractions.map(t => new URL(t.url).hostname.replace('www.','')).join(', ')}). Close them.`;
+    div.textContent = `${distractions.length} distraction tab${distractions.length > 1 ? 's' : ''} detected (${distractions.map(t => new URL(t.url).hostname.replace('www.','')).join(', ')}). Close them.`;
     msgs.appendChild(div);
     document.getElementById('ai-panel').classList.remove('hidden');
   }

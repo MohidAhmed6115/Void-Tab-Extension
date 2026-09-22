@@ -1,8 +1,8 @@
 # VoidTab
 
-> **A free, open-source alternative to Lumi List and Obsidian — built right into your Chrome new tab.**
+> A free, open-source new tab replacement for Chrome — bookmark boards, a fully customizable background, and a built-in Claude-powered AI coach.
 
-VoidTab replaces your default new tab with a personal productivity dashboard. Organize bookmarks across multiple boards, drag groups anywhere on the canvas, and get real-time focus coaching from a built-in Claude-powered AI that watches your open tabs for distractions.
+VoidTab turns your new tab page into a personal dashboard. Organize bookmarks across multiple boards, drag groups anywhere on the canvas, style the background and clock however you like, and get real-time focus coaching from an AI that watches your open tabs for distractions.
 
 No subscription. No account. No cloud sync required.
 
@@ -10,73 +10,83 @@ No subscription. No account. No cloud sync required.
 
 ## Features
 
-### 🗂️ Multi-Board Workspace
-Create multiple named boards — think of them like separate desktops. Switch between them from the tab bar at the top. Each board has its own groups, layout, and card positions. Right-click any board tab to delete it.
+### Multi-Board Workspace
+Create multiple named boards — think of them as separate desktops. Switch between them from the tab bar at the top, double-click a tab to rename it, or right-click to delete it. Each board keeps its own groups and card layout.
 
-### 📌 Bookmark Groups
-Bookmarks are organized into group cards. Each card has a name, a list of bookmarks with favicons, and controls to add or remove items. Double-click a group title to rename it inline. Favicons are fetched automatically, with a letter-based placeholder as fallback.
+### Bookmark Groups
+Bookmarks are organized into group cards. Each card has a name, a list of bookmarks with favicons (falling back to a colored letter tile if a favicon fails to load), and controls to add or remove items. Double-click a group title to rename it inline.
 
-### 🖱️ Free-Position Canvas
-Groups are not locked to a grid — drag them anywhere on screen. Cards snap to column alignment and stack neatly above or below each other with a consistent gap, keeping things tidy without forcing a rigid layout.
+### Add / Edit Bookmark Dialog
+Adding or editing a bookmark opens a proper dialog with a link field, a name field that autofills from the link, a live favicon preview, and a group picker — no browser prompt windows.
 
-### ✏️ Edit Mode
-Toggle Edit Mode from the sidebar to unlock drag handles on group cards and enable bookmark reordering. While in Edit Mode, bookmarks become draggable between groups via HTML5 drag-and-drop.
+### Free-Position Canvas
+Groups aren't locked to a grid. In Edit Mode, drag a card by its handle anywhere on the canvas; it snaps to column alignment and stacks neatly above or below other cards with a consistent gap. Bookmarks themselves can be dragged between groups in Edit Mode too.
 
-### 🔍 Global Search
-Search across every board, group, and bookmark at once — by title or URL. Open with the sidebar button or press `Ctrl+K` / `Cmd+K`. Click any result to open it immediately.
+### Import & Export Bookmarks (.txt)
+Export every bookmark as a plain text file: each entry is the bookmark name, then its link, then a blank line. Copy it to the clipboard or download it directly.
 
-### 📥 Bulk Import with AI
-Paste a list of URLs (one per line) and hit **Analyze with AI**. Claude reads the URLs and suggests which group each one belongs to, including creating new group names if needed. You approve each addition individually.
+Import accepts that same format, or just a plain list of links (names are filled in automatically). You can paste text or load a `.txt` file, choose which board and group to add into (or create a new group on the fly), skip links that are already in the target group, and optionally have Claude sort the imported links into suggested groups before confirming.
 
-### 🤖 AI Focus Coach
+### Global Search
+Search across every board, group, and bookmark at once — by title or URL. Open it from the sidebar or `Ctrl+K` / `Cmd+K`. Click any result to open it.
+
+### AI Focus Coach
 A floating button opens a chat panel powered by Claude. The AI has live context — it knows your boards, your bookmarks, and your currently open tabs. Use it to:
-- Ask where to put a new bookmark
-- Say `check my tabs` to get a distraction audit
-- Ask `what should I do now?` for a one-line next action
-- Chat freely about productivity, focus, or task planning
+- Ask where a new bookmark should go
+- Say "check my tabs" for a distraction audit
+- Ask "what should I do now?" for a one-line next action
+- Chat about productivity, focus, or task planning
 
-The AI is direct and minimal — no fluff, no generic motivation.
+The AI is direct and minimal — no fluff, no generic motivation. It requires your own Anthropic API key (see AI Setup below); without one, everything else in VoidTab still works normally.
 
-### ⚡ Auto Distraction Warning
-Every time you open a new tab, VoidTab silently checks your open tabs. If it finds 2 or more distraction sites (YouTube, Reddit, Twitter, TikTok, Instagram, etc.) open at the same time, the AI panel auto-opens with a one-line warning. It says it once and gets out of the way.
+### Automatic Distraction Warning
+Whenever you open a new tab, VoidTab quietly checks your other open tabs. If two or more known distraction sites (YouTube, Reddit, Twitter/X, TikTok, Instagram, and similar) are open at once, the AI panel opens on its own with a one-line warning, then gets out of the way.
 
-### 🎨 7 Card Effects
-Choose how your group cards look from Settings:
+### Backgrounds
+Background settings live behind the image icon in the bottom-left corner, across three tabs:
 
-| Effect | Description |
-|---|---|
-| ✦ Transparent | Clean, minimal glass |
-| ❄ Frosted | Blurred frosted glass |
-| 👻 Ghost | Ultra-light ghost panel |
-| ⚡ Neon Glow | Glowing accent borders |
-| 🌫 Smoke | Dark smoked glass |
-| 🌌 Aurora | Gradient aurora tint |
-| ◼ Matte Dark | Solid dark matte |
+**Scene** — used whenever no wallpaper image is set. Choose from nine built-in scenes (including Daylight, a light default with white base and green/purple glow, plus darker options like Void, Aurora, Sunset, Ocean, Ember, Forest, Dusk, and Mono), or pick Custom and set your own base and glow colors. Toggle the animated drifting glow, film grain, and an optional dot or grid pattern.
 
-### 🖼️ Custom Wallpaper
-Upload any image from your device or paste an image URL. Local images are stored in your browser — nothing leaves your machine.
+**Image** — upload a wallpaper from your device (stored locally in your browser) or paste an image URL. Adjust blur and dimming with sliders, or remove the image to fall back to the scene.
 
-### 🌗 Theme Support
-Auto (follows system dark/light preference), forced Dark, or forced Light.
+**Cursor effect** — an optional reactive layer that follows your mouse on top of any scene or wallpaper: Spotlight, Particles, Ripples, Trail, or Constellation (a web of dim nodes that lights up in your accent color near the cursor). Adjustable intensity.
 
-### 🔒 Privacy Blur
-One click blurs all bookmark titles and URLs across the entire page. Useful when screen sharing or presenting without exposing your bookmarks.
+An accent color picker (eight presets plus a custom color) is also available in Settings and is used throughout the interface — buttons, the active board tab, glow effects, and more.
 
-### 🕵️ Incognito Support
-Open any bookmark in an incognito window from the right-click context menu, or open any URL in incognito from the sidebar button.
+### Card Effects
+Seven visual styles for group cards, set from Settings → Cards: Transparent, Frosted, Ghost, Neon Glow, Smoke, Aurora, and Matte Dark.
 
-### ☑️ Multi-Select Mode
-Select multiple bookmarks at once for batch actions.
+### Clock & Search Customization
+Settings → Clock & Search lets you:
+- Show or hide the clock, date, and greeting independently
+- Switch between 12- and 24-hour time, and toggle seconds
+- Set your name for the greeting
+- Choose clock size (Small / Medium / Large), font (Sans / Display / Mono / Serif), weight (Light / Regular / Bold), and color (Theme / Accent / Custom)
+- Show or hide the search bar, which searches your default engine or opens a typed URL directly
+- Drag the clock to any position on screen while Edit Mode is on, with a one-click reset to center
 
-### 🗑️ Trash Bin
-Deleted bookmarks go to the Trash instead of being permanently removed. Restore any item back to its original group (the group is recreated if it was also deleted). Or empty the trash permanently.
+### Theme
+Auto (follows your system's dark/light preference), or forced Dark / Light.
 
-### ⌨️ Keyboard Shortcuts
+### Privacy Blur
+One click blurs every bookmark title, URL, and favicon across the page — useful when screen sharing.
+
+### Incognito Support
+Open any bookmark in an incognito window from its right-click menu, or open any URL in incognito from the sidebar.
+
+### Multi-Select Mode
+Select multiple bookmarks at once to open them all or delete them together.
+
+### Trash Bin
+Deleted bookmarks go to the Trash instead of disappearing immediately. Restore an item to its original group (recreated automatically if it was also deleted), or empty the trash permanently.
+
+### Keyboard Shortcuts
 
 | Shortcut | Action |
 |---|---|
 | `Ctrl+K` / `Cmd+K` | Open global search |
-| `Escape` | Close any open modal |
+| `/` | Focus the search bar (when visible and no field is already focused) |
+| `Escape` | Close the open modal or context menu |
 
 ---
 
@@ -88,35 +98,35 @@ VoidTab is a Chrome extension loaded in developer mode. It is not on the Chrome 
 2. Open Chrome and go to `chrome://extensions`
 3. Enable **Developer mode** (top right toggle)
 4. Click **Load unpacked**
-5. Select the `VoidTab Extension` folder
+5. Select the `VoidTab` folder
 6. Open a new tab — VoidTab is live
 
 ---
 
 ## AI Setup
 
-The AI Coach requires an Anthropic API key. Without it, VoidTab works fully — only the AI features are disabled.
+The AI Coach and AI-assisted import sorting require your own Anthropic API key. Without one, VoidTab works fully — only those two AI features are disabled, and bulk import falls back to a simple rule-based group guesser.
 
 1. Get an API key from [console.anthropic.com](https://console.anthropic.com)
-2. Open VoidTab → click the ⚙ Settings icon in the sidebar
-3. Paste your key in the **Anthropic API Key** field
-4. Click **Save**
+2. Open VoidTab, click the Settings icon in the sidebar
+3. Paste your key into the **Anthropic API Key** field
 
-The key is stored locally in your browser via `chrome.storage.sync`. It is never sent anywhere except directly to the Anthropic API.
+The key is stored locally in your browser via `chrome.storage.local` and is sent only to the Anthropic API, directly from your browser.
 
 ---
 
 ## Project Structure
 
 ```
-VoidTab Extension/
+VoidTab/
 ├── manifest.json              # Chrome extension manifest (v3)
-├── newtab.html                # Main page structure and modals
-├── css/
-│   └── newtab.css             # All styling, themes, and card effects
+├── newtab.html                # Page structure, icon sprite, and all modals
+├── newtab_files/
+│   ├── newtab.css             # Styling, scenes, card effects, and themes
+│   ├── newtab.js              # Core logic: boards, groups, bookmarks, backgrounds, clock, dialogs
+│   ├── ai.js                  # AI Coach: chat, tab analysis, bulk import suggestions
+│   └── css2                   # Google Fonts stylesheet (DM Sans, Syne)
 ├── js/
-│   ├── newtab.js              # Core logic: boards, groups, bookmarks, UI
-│   ├── ai.js                  # AI Coach: chat, tab analysis, bulk import
 │   └── background.js          # Service worker: incognito tab handling
 └── icons/
     ├── icon16.png
@@ -130,9 +140,10 @@ VoidTab Extension/
 
 | Permission | Why |
 |---|---|
-| `tabs` | AI Coach reads open tab titles and URLs for distraction detection |
-| `storage` | Saves your boards, groups, bookmarks, and settings via `chrome.storage.sync` |
-| `tabGroups` | Reserved for future tab grouping features |
+| `tabs` | The AI Coach reads open tab titles and URLs for distraction detection |
+| `storage` | Saves your boards, groups, bookmarks, and settings via `chrome.storage.local` |
+| `search` | Powers the search bar, which queries your browser's default search engine |
+| `tabGroups` | Reserved for future tab-grouping features |
 | `bookmarks` | Reserved for future Chrome bookmark import |
 
 ---
@@ -141,20 +152,23 @@ VoidTab Extension/
 
 | Feature | VoidTab | Lumi List | Obsidian |
 |---|---|---|---|
-| Free | ✅ | ❌ Paid tiers | ✅ (free tier) |
-| Browser new tab | ✅ | ✅ | ❌ |
-| No account required | ✅ | ❌ | ✅ |
-| AI focus coaching | ✅ | ❌ | ❌ |
-| Live tab monitoring | ✅ | ❌ | ❌ |
-| Custom wallpapers | ✅ | Limited | ❌ |
-| Card visual effects | ✅ 7 effects | ❌ | ❌ |
-| Open source | ✅ | ❌ | ❌ |
+| Free | ✓ | ✗ (paid tiers) | ✓ (free tier) |
+| Browser new tab | ✓ | ✓ | ✗ |
+| No account required | ✓ | ✗ | ✓ |
+| AI focus coaching | ✓ | ✗ | ✗ |
+| Live tab monitoring | ✓ | ✗ | ✗ |
+| Bookmark import/export as text | ✓ | ✗ | ✗ |
+| Custom wallpapers and scenes | ✓ | Limited | ✗ |
+| Cursor effects | ✓ — 5 effects | ✗ | ✗ |
+| Card visual effects | ✓ — 7 effects | ✗ | ✗ |
+| Open source | ✓ | ✗ | ✗ |
 
 ---
 
 ## Authors
 
 Built by **Mohid Ahmed** — Software Engineering student at Riphah International University.
+Fine-tuned by **Hanan Shafay** — Software Engineering student at Riphah International University.
 
 ---
 
