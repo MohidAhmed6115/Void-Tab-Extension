@@ -10,39 +10,39 @@ No subscription. No account. No cloud sync required.
 
 ## Features
 
-### 🗂️ Multi-Board Workspace
+### Multi-Board Workspace
 
 Create multiple named boards — think of them like separate desktops. Switch between them from the tab bar at the top, or cycle with `[` / `]`. Each board has its own groups, layout, and card positions. Right-click any board tab to delete it.
 
-### 📌 Bookmark Groups
+###  Bookmark Groups
 
 Bookmarks are organized into group cards. Each card has a name, an optional emoji icon, an optional custom accent color, a list of bookmarks with favicons, and controls to add or remove items. Double-click a group title to rename it and edit its icon/accent. Favicons are fetched automatically, with a letter-based placeholder as fallback.
 
-### 🎨 Group Accent Tint
+### Group Accent Tint
 
 Give any group card a custom accent color. The color subtly tints the card itself — layered *under* the glass blur via `color-mix()`, so the blur stays exactly as-is, just with a colored wash — plus the add-bookmark button and the selected-item highlight. Purely optional; cards default to the global accent if you don't set one.
 
-### 🧱 Group Templates
+### Group Templates
 
 One-click starter groups — Coding, Learning, AI, Socials, News, Design — each prefilled with a few common links you can edit afterward. Available from the "New Group" modal.
 
-### 🖱️ Free-Position Canvas
+###  Free-Position Canvas
 
 Groups are not locked to a grid — drag them anywhere on screen. Cards snap to column alignment and stack neatly above or below each other with a consistent gap, keeping things tidy without forcing a rigid layout.
 
-### ✏️ Edit Mode
+### Edit Mode
 
 Toggle Edit Mode from the sidebar to unlock drag handles on group cards and enable bookmark reordering. While in Edit Mode, bookmarks become draggable between groups via HTML5 drag-and-drop.
 
-### 🔍 Global Search
+###  Global Search
 
 Search across every board, group, and bookmark at once — by title or URL. Open with the sidebar button or press `Ctrl+K` / `Cmd+K`, or press `/` to focus the search box on the home screen. Click any result to open it immediately.
 
-### 📥 Bulk Import with AI
+### Bulk Import with AI
 
 Paste a list of URLs (one per line) and hit **Analyze with AI**. Claude reads the URLs and suggests which group each one belongs to, including creating new group names if needed. You approve each addition individually.
 
-### 🤖 AI Focus Coach
+### AI Focus Coach
 
 A floating button opens a chat panel powered by Claude. The AI has live context — it knows your boards, your bookmarks, and your currently open tabs. Use it to:
 
@@ -53,11 +53,11 @@ A floating button opens a chat panel powered by Claude. The AI has live context 
 
 The AI is direct and minimal — no fluff, no generic motivation.
 
-### ⚡ Auto Distraction Warning
+### Auto Distraction Warning
 
 Every time you open a new tab, VoidTab silently checks your open tabs. If it finds 2 or more distraction sites (YouTube, Reddit, Twitter, TikTok, Instagram, etc.) open at the same time, the AI panel auto-opens with a one-line warning. It says it once and gets out of the way.
 
-### 🧩 Widgets Panel
+### Widgets Panel
 
 A dedicated panel (sidebar icon, or press `W`) with four tabs:
 
@@ -66,40 +66,40 @@ A dedicated panel (sidebar icon, or press `W`) with four tabs:
 - **Recently Closed Tabs** — restore tabs you've closed, powered by `chrome.sessions`.
 - **Weather** — current conditions via [Open-Meteo](https://open-meteo.com/) (no API key needed). Search a city or use your location, toggle °C/°F. Only fetches when you actually open the tab, so it never slows down page load.
 
-### 🎨 7 Card Effects
+### 7 Card Effects
 
 Choose how your group cards look from Settings:
 
 | Effect        | Description             |
 | ------------- | ------------------------ |
-| ✦ Transparent | Clean, minimal glass     |
-| ❄ Frosted     | Blurred frosted glass    |
-| 👻 Ghost       | Ultra-light ghost panel  |
-| ⚡ Neon Glow   | Glowing accent borders   |
-| 🌫 Smoke       | Dark smoked glass        |
-| 🌌 Aurora      | Gradient aurora tint     |
-| ◼ Matte Dark  | Solid dark matte         |
+|  Transparent | Clean, minimal glass     |
+|  Frosted     | Blurred frosted glass    |
+|  Ghost       | Ultra-light ghost panel  |
+|  Neon Glow   | Glowing accent borders   |
+|  Smoke       | Dark smoked glass        |
+|  Aurora      | Gradient aurora tint     |
+|  Matte Dark  | Solid dark matte         |
 
 On top of the effect preset, independent **card opacity** and **card blur** sliders let you fine-tune the glass strength further.
 
-### 🖌️ Layout & Typography
+### Layout & Typography
 
 - **Density** — Compact, Comfortable, or Spacious spacing across the whole layout.
 - **Font** — 5 system font stacks (Default, System UI, Serif, Monospace, Rounded). No external font downloads — everything renders from fonts already on your device.
 
-### 🖼️ Custom Wallpaper
+### Custom Wallpaper
 
 Upload any image from your device or paste an image URL, either globally or **per board**. A board-specific wallpaper overrides the global one only while that board is open, and falls back to the global background/scene otherwise. The image preloads before switching boards, so it never flashes blank mid-switch. Local images are stored in your browser — nothing leaves your machine.
 
-### 🌌 Scenes
+### Scenes
 
 11 built-in animated scenes (Void, Aurora, Sunset, Ocean, Ember, Forest, Dusk, Mono, Glacier, Crimson, Candy) plus a fully custom scene with your own base and accent colors.
 
-### 🌗 Theme Support
+### Theme Support
 
 Auto (follows system dark/light preference), forced Dark, or forced Light.
 
-### 🖱️ Cursor Personalization
+### Cursor Personalization
 
 Reactive effects that follow your cursor, layered on top of scenes and wallpapers:
 
@@ -111,23 +111,23 @@ Separately, **Custom cursor icon** replaces your actual OS pointer with an uploa
 
 All motion-based cursor effects automatically respect your system's `prefers-reduced-motion` setting, and particle count scales down on lower-core-count devices to avoid lag.
 
-### 🔒 Privacy Blur
+### Privacy Blur
 
 One click blurs all bookmark titles and URLs across the entire page. Useful when screen sharing or presenting without exposing your bookmarks.
 
-### 🕵️ Incognito Support
+### Incognito Support
 
 Open any bookmark in an incognito window from the right-click context menu, or open any URL in incognito from the sidebar button.
 
-### ☑️ Multi-Select Mode
+### Multi-Select Mode
 
 Select multiple bookmarks at once for batch actions.
 
-### 🗑️ Trash Bin
+### Trash Bin
 
 Deleted bookmarks go to the Trash instead of being permanently removed. Restore any item back to its original group (the group is recreated if it was also deleted). Or empty the trash permanently.
 
-### ⌨️ Keyboard Shortcuts
+### Keyboard Shortcuts
 
 | Shortcut            | Action                         |
 | -------------------- | ------------------------------- |
