@@ -217,7 +217,7 @@ VoidTab Extension/
 
 ## Authors
 
-Built by **Mohid Ahmed** — Software Engineering student at Riphah International University.
+Built by **Mohid Ahmed** — Software Engineering student at **Riphah International University**.Fine-tuned by **Hanan Shafay** — Software Engineering student at **Riphah International University**
 
 ---
 
