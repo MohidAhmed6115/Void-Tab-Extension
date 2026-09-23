@@ -11,7 +11,12 @@
     "storage",
     "tabGroups",
     "bookmarks",
-    "search"
+    "search",
+    "sessions"
+  ],
+  "host_permissions": [
+    "https://api.open-meteo.com/*",
+    "https://geocoding-api.open-meteo.com/*"
   ],
   "background": {
     "service_worker": "js/background.js"

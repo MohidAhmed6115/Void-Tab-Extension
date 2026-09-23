@@ -28,17 +28,28 @@
   --sidebar-bg: rgba(255,255,255,0.07);
   --card-hover-bg: rgba(255,255,255,0.14);
 
-  --clock-font: var(--font-body);
-  --clock-weight: 300;
-  --clock-color: var(--text-primary);
-
   /* default scene (Void) */
   --sc-bg1: #05070a; --sc-bg2: #0c1117;
   --sc-c1: #22c55e; --sc-c2: #0d9488; --sc-c3: #2563eb; --sc-c4: #15803d;
   --blob-o: 0.5;
   --pat-c: rgba(255,255,255,0.13);
   --wp-blur: 0px; --wp-dim: 0;
+
+  /* card transparency / glass slider (see .group-card) */
+  --card-glass-alpha: 100%;
+  --card-glass-blur: 20px;
+  --card-tint-alpha: 0%;
+
+  /* layout density (see [data-density]) */
+  --card-pad: 16px;
+  --bm-pad-y: 5px;
+  --bm-gap: 2px;
 }
+
+/* ========== LAYOUT DENSITY ========== */
+:root[data-density="compact"]    { --card-pad: 10px; --bm-pad-y: 2px; --bm-gap: 0px; }
+:root[data-density="comfortable"]{ --card-pad: 16px; --bm-pad-y: 5px; --bm-gap: 2px; }
+:root[data-density="spacious"]   { --card-pad: 22px; --bm-pad-y: 8px; --bm-gap: 6px; }
 
 /* ========== CARD EFFECTS ========== */
 :root[data-card-effect="transparent"] { --glass-bg: rgba(255,255,255,0.08); --glass-border: rgba(255,255,255,0.14); --glass-blur: blur(20px); --sidebar-bg: rgba(255,255,255,0.07); --card-hover-bg: rgba(255,255,255,0.14); }
@@ -110,7 +121,7 @@ button { font-family: inherit; color: inherit; }
 @keyframes drift2 { to { transform: translate3d(-14vmax, 14vmax, 0) scale(0.9); } }
 @keyframes drift3 { to { transform: translate3d(12vmax, -12vmax, 0) scale(1.12); } }
 @keyframes drift4 { to { transform: translate3d(-16vmax, -8vmax, 0) scale(1.2); } }
-@media (prefers-reduced-motion: reduce) { .sc-blob { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .sc-blob { animation: none !important; } #fx-sprite { transition: none !important; } }
 
 .sc-pattern { position: absolute; inset: 0; opacity: 0; transition: opacity 0.4s ease;
   -webkit-mask-image: radial-gradient(ellipse at center, #000 25%, transparent 85%);
@@ -150,6 +161,12 @@ body:not(.has-wp) #wallpaper-overlay, body:not(.has-wp) #wallpaper-bg { display:
   background:
     radial-gradient(circle 300px at var(--mx) var(--my), rgba(var(--accent-rgb),0.22), transparent 70%),
     radial-gradient(circle 140px at var(--mx) var(--my), rgba(255,255,255,0.55), transparent 70%);
+}
+#fx-sprite {
+  position: fixed; top: 0; left: 0; z-index: 3; pointer-events: none;
+  width: 34px; height: 34px; opacity: 0;
+  transform: translate(-999px,-999px) translate(-50%,-50%);
+  transition: opacity 0.2s ease; will-change: transform;
 }
 
 /* ========== BOARD TABS BAR ========== */
@@ -199,8 +216,8 @@ body:not(.has-wp) #wallpaper-overlay, body:not(.has-wp) #wallpaper-bg { display:
 #hero-greeting { font-family: var(--font-display); font-size: 16px; font-weight: 500; letter-spacing: 0.05em; color: var(--text-secondary); text-shadow: var(--shadow-text); }
 #hero-time {
   display: flex; align-items: baseline; justify-content: center; gap: 4px;
-  font-family: var(--clock-font); font-weight: var(--clock-weight); font-size: var(--clock-size); line-height: 1.02;
-  letter-spacing: -0.04em; color: var(--clock-color); text-shadow: var(--shadow-text);
+  font-family: var(--font-body); font-weight: 300; font-size: var(--clock-size); line-height: 1.02;
+  letter-spacing: -0.04em; color: var(--text-primary); text-shadow: var(--shadow-text);
   font-variant-numeric: tabular-nums;
 }
 #hero-sec { font-size: 0.42em; letter-spacing: 0; opacity: 0.55; }
@@ -236,13 +253,15 @@ body.edit-mode #hero-search { pointer-events: none; }
 
 /* ========== BOOKMARK GROUP CARD ========== */
 .group-card {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+  background: color-mix(in srgb, var(--group-accent, var(--accent)) var(--card-tint-alpha), color-mix(in srgb, var(--glass-bg) var(--card-glass-alpha), transparent));
+  backdrop-filter: blur(var(--card-glass-blur)); -webkit-backdrop-filter: blur(var(--card-glass-blur));
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-card);
-  padding: 16px; width: 240px; min-height: 190px;
+  padding: var(--card-pad); width: 240px; min-height: 190px;
   flex: 0 0 auto; position: relative;
   transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+  --group-accent: var(--accent);
+  --group-accent-rgb: var(--accent-rgb);
 }
 .group-card:hover { background: var(--card-hover-bg); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
 
@@ -272,23 +291,29 @@ body.intro .group-card { animation: cardIn 0.55s cubic-bezier(0.2,0.7,0.2,1) bot
   cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition);
 }
 .group-add-btn { border-radius: 50%; border: 1px dashed var(--glass-border); }
-.group-add-btn:hover, .group-delete-btn:hover { color: var(--text-primary); background: var(--surface-hover); border-color: var(--border); }
-.group-delete-btn:hover { color: var(--danger); }
+.group-add-btn:hover { color: var(--group-accent, var(--text-primary)); background: rgba(var(--group-accent-rgb, var(--accent-rgb)),0.14); border-color: var(--group-accent, var(--border)); }
+.group-delete-btn:hover { color: var(--danger); background: var(--surface-hover); border-color: var(--border); }
 
-.bookmark-list { display: flex; flex-direction: column; gap: 2px; }
+.group-accent-dot {
+  width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+  background: var(--group-accent, var(--accent)); box-shadow: 0 0 0 2px rgba(var(--group-accent-rgb, var(--accent-rgb)),0.25);
+}
+.group-icon { font-size: 14px; line-height: 1; flex-shrink: 0; }
+
+.bookmark-list { display: flex; flex-direction: column; gap: var(--bm-gap); }
 
 /* ========== BOOKMARK ITEM ========== */
 /* The border is always present (transparent) so hover never changes the box size. */
 .bookmark-item {
   display: flex; align-items: center; gap: 8px;
-  padding: 5px 3px;
+  padding: var(--bm-pad-y) 3px;
   border: 1px solid transparent;
   border-radius: 8px; cursor: pointer;
   transition: background var(--transition), border-color var(--transition);
   position: relative; min-height: 30px;
 }
 .bookmark-item:hover { background: var(--surface-hover); border-color: var(--border); }
-.bookmark-item.selected { background: rgba(var(--accent-rgb),0.14); border-color: var(--accent); }
+.bookmark-item.selected { background: rgba(var(--group-accent-rgb, var(--accent-rgb)),0.14); border-color: var(--group-accent, var(--accent)); }
 
 .bookmark-favicon { width: 16px; height: 16px; border-radius: 3px; flex-shrink: 0; object-fit: contain; }
 .bookmark-favicon-placeholder {
@@ -524,7 +549,7 @@ body.intro .group-card { animation: cardIn 0.55s cubic-bezier(0.2,0.7,0.2,1) bot
 .seg button.active { background: var(--accent); color: var(--on-accent); font-weight: 600; }
 
 /* Chips */
-#card-effect-select, #fx-select, #clock-color-select { display: flex; flex-wrap: wrap; gap: 8px; }
+#card-effect-select, #fx-select, .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
@@ -540,9 +565,6 @@ body.intro .group-card { animation: cardIn 0.55s cubic-bezier(0.2,0.7,0.2,1) bot
 .chip[data-effect="smoke"] .dot { background: #a7a7b8; }
 .chip[data-effect="aurora"] .dot { background: #8b5cf6; border-color: #a78bfa; }
 .chip[data-effect="matte-dark"] .dot { background: #0a0a0e; }
-.chip[data-cc="theme"] .dot { background: var(--text-primary); }
-.chip[data-cc="accent"] .dot { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
-.chip[data-cc="custom"] .dot { background: conic-gradient(from 0deg, #ef4444, #f59e0b, #22c55e, #06b6d4, #6366f1, #ec4899, #ef4444); }
 
 /* Accent swatches */
 #accent-swatches { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }

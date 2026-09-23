@@ -6,8 +6,8 @@
   <title>VoidTab</title>
   <link rel="icon" type="image/png" href="icons/icon128.png">
   <link rel="preconnect" href="https://fonts.googleapis.com/">
-  <link href="./newtab_files/css2" rel="stylesheet">
-  <link rel="stylesheet" href="./newtab_files/newtab.css">
+  <link href="./css/css2" rel="stylesheet">
+  <link rel="stylesheet" href="./css/newtab.css">
 </head>
 <body>
 
@@ -54,6 +54,7 @@
   <!-- Cursor effects -->
   <div id="fx-spot"></div>
   <canvas id="fx-canvas"></canvas>
+  <img id="fx-sprite" alt="">
 
   <!-- Top Board Tabs -->
   <header id="board-tabs-bar">
@@ -87,6 +88,7 @@
     <button class="sidebar-btn" id="btn-incognito" data-tip="Open link in incognito" aria-label="Open link in incognito"><svg class="ic" width="18" height="18"><use href="#i-incognito"/></svg></button>
     <button class="sidebar-btn" id="btn-multiselect" data-tip="Select multiple" aria-label="Select multiple"><svg class="ic" width="18" height="18"><use href="#i-select"/></svg></button>
     <button class="sidebar-btn" id="btn-trash" data-tip="Trash" aria-label="Trash"><svg class="ic" width="18" height="18"><use href="#i-trash"/></svg></button>
+    <button class="sidebar-btn" id="btn-widgets" data-tip="Widgets (W)" aria-label="Widgets"><svg class="ic" width="18" height="18"><use href="#i-select"/></svg></button>
     <button class="sidebar-btn" id="btn-privacy" data-tip="Privacy blur" aria-label="Privacy blur"><svg class="ic" width="18" height="18"><use href="#i-eye"/></svg></button>
     <button class="sidebar-btn" id="btn-settings" data-tip="Settings" aria-label="Settings"><svg class="ic" width="18" height="18"><use href="#i-settings"/></svg></button>
     <button class="sidebar-btn" id="btn-edit-mode" data-tip="Edit layout" aria-label="Edit layout"><svg class="ic" width="18" height="18"><use href="#i-edit"/></svg></button>
@@ -213,12 +215,64 @@ https://claude.ai"></textarea>
     </div>
   </div>
 
+  <!-- Widgets Modal -->
+  <div id="widgets-modal" class="modal hidden">
+    <div class="modal-box wide">
+      <h3>Widgets</h3>
+      <div class="m-tabs">
+        <button class="m-tab active" data-tab="w-todo">To-Do</button>
+        <button class="m-tab" data-tab="w-notes">Notes</button>
+        <button class="m-tab" data-tab="w-closed">Closed Tabs</button>
+        <button class="m-tab" data-tab="w-weather">Weather</button>
+      </div>
+
+      <div class="m-panel active" id="w-todo">
+        <div class="row-split">
+          <input id="todo-input" type="text" placeholder="Add a to-do..." autocomplete="off" style="flex:1">
+          <button class="btn primary" id="todo-add-btn"><svg class="ic" width="14" height="14"><use href="#i-plus"/></svg></button>
+        </div>
+        <div id="todo-list"></div>
+      </div>
+
+      <div class="m-panel" id="w-notes">
+        <textarea id="notes-textarea" placeholder="Quick notes... (saved automatically)" spellcheck="false" style="min-height:220px"></textarea>
+      </div>
+
+      <div class="m-panel" id="w-closed">
+        <div class="row-split">
+          <p class="hint">Tabs you've recently closed in this browser.</p>
+          <button class="btn" id="closed-refresh-btn">Refresh</button>
+        </div>
+        <div id="closed-list"></div>
+      </div>
+
+      <div class="m-panel" id="w-weather">
+        <div id="weather-body"></div>
+        <div class="row-split">
+          <input id="weather-city-input" type="text" placeholder="Enter a city..." autocomplete="off" style="flex:1">
+          <button class="btn" id="weather-search-btn">Search</button>
+        </div>
+        <button class="btn" id="weather-locate-btn"><svg class="ic" width="14" height="14"><use href="#i-globe"/></svg>Use my location</button>
+        <div class="field"><span>Units</span>
+          <div class="seg" id="seg-weather-unit">
+            <button data-val="c">°C</button><button data-val="f">°F</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn primary modal-close-btn">Done</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Settings Modal -->
   <div id="settings-modal" class="modal hidden">
     <div class="modal-box wide">
       <h3>Settings</h3>
       <div class="m-tabs">
         <button class="m-tab active" data-tab="s-general">General</button>
+        <button class="m-tab" data-tab="s-layout">Layout</button>
         <button class="m-tab" data-tab="s-clock">Clock &amp; Search</button>
         <button class="m-tab" data-tab="s-cards">Cards</button>
       </div>
@@ -237,6 +291,25 @@ https://claude.ai"></textarea>
         <label class="field"><span>Anthropic API Key (for AI Coach)</span>
           <input id="api-key-input" type="password" placeholder="sk-ant-...">
         </label>
+        <p class="hint">Your key is stored locally in the browser and sent only to Anthropic's API when you use the AI Coach.</p>
+      </div>
+
+      <div class="m-panel" id="s-layout">
+        <div class="field"><span>Layout density</span>
+          <div class="seg" id="seg-density">
+            <button data-val="compact">Compact</button><button data-val="comfortable">Comfortable</button><button data-val="spacious">Spacious</button>
+          </div>
+        </div>
+        <label class="field"><span>Font</span>
+          <select id="font-select">
+            <option value="default">Default (Syne / DM Sans)</option>
+            <option value="system">System UI</option>
+            <option value="serif">Serif</option>
+            <option value="mono">Monospace</option>
+            <option value="rounded">Rounded</option>
+          </select>
+        </label>
+        <p class="hint">Font choices use fonts already on your device, so there's nothing extra to download.</p>
       </div>
 
       <div class="m-panel" id="s-clock">
@@ -253,24 +326,6 @@ https://claude.ai"></textarea>
             <button data-val="s">Small</button><button data-val="m">Medium</button><button data-val="l">Large</button>
           </div>
         </div>
-        <div class="field"><span>Clock font</span>
-          <div class="seg" id="seg-clockfont">
-            <button data-val="body">Sans</button><button data-val="display">Display</button><button data-val="mono">Mono</button><button data-val="serif">Serif</button>
-          </div>
-        </div>
-        <div class="field"><span>Clock weight</span>
-          <div class="seg" id="seg-clockweight">
-            <button data-val="300">Light</button><button data-val="500">Regular</button><button data-val="700">Bold</button>
-          </div>
-        </div>
-        <div class="field"><span>Clock color</span>
-          <div id="clock-color-select">
-            <button class="chip" data-cc="theme"><i class="dot"></i>Theme</button>
-            <button class="chip" data-cc="accent"><i class="dot"></i>Accent</button>
-            <button class="chip" data-cc="custom"><i class="dot"></i>Custom</button>
-          </div>
-        </div>
-        <label class="field hidden" id="clock-custom-color-field"><span>Custom clock color</span><input type="color" id="clock-color-custom"></label>
         <label class="switch-row"><span>Show search bar</span><input type="checkbox" class="switch" id="set-search"></label>
         <div class="row-split">
           <p class="hint">Turn on Edit layout (pencil) to drag the clock anywhere.</p>
@@ -290,6 +345,8 @@ https://claude.ai"></textarea>
             <button class="chip effect-btn" data-effect="matte-dark"><i class="dot"></i>Matte Dark</button>
           </div>
         </div>
+        <label class="field range-field"><span>Card opacity <em id="v-cardalpha">100%</em></span><input type="range" id="set-cardalpha" min="10" max="100" step="5"></label>
+        <label class="field range-field"><span>Card blur <em id="v-cardblur">20px</em></span><input type="range" id="set-cardblur" min="0" max="40" step="1"></label>
       </div>
 
       <div class="modal-actions" id="settings-actions">
@@ -303,6 +360,13 @@ https://claude.ai"></textarea>
     <div class="modal-box">
       <h3>New Group</h3>
       <label class="field"><span>Group Name</span> <input id="new-group-name" type="text" placeholder="e.g. Design" autocomplete="off"></label>
+      <div class="row-split">
+        <label class="field" style="flex:1"><span>Icon (optional)</span> <input id="new-group-icon" type="text" placeholder="🎨" maxlength="4" autocomplete="off"></label>
+        <label class="field" style="flex:1"><span>Card color (tint)</span> <input id="new-group-accent" type="color"></label>
+      </div>
+      <p class="hint">The card stays blurred/glass — the color just tints it subtly.</p>
+      <p class="hint">Or start from a template — this fills the group with a few common links you can edit later.</p>
+      <div id="group-template-chips" class="chip-row"></div>
       <div class="modal-actions" id="add-group-actions">
         <button class="btn modal-close-btn">Cancel</button>
         <button class="btn primary" id="confirm-add-group-btn">Create</button>
@@ -354,10 +418,27 @@ https://claude.ai"></textarea>
         </div>
         <label class="field range-field"><span>Blur <em id="v-wpblur">0px</em></span><input type="range" id="set-wpblur" min="0" max="24" step="1"></label>
         <label class="field range-field"><span>Dim <em id="v-wpdim">0%</em></span><input type="range" id="set-wpdim" min="0" max="70" step="1"></label>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:2px 0">
+        <p class="hint">Give <strong id="wp-board-name">this board</strong> its own wallpaper instead. It only shows while that board is open — other boards keep using the background above.</p>
+        <div class="field"><span>Upload image for this board</span>
+          <div id="upload-wallpaper-board-area">
+            <input type="file" id="wallpaper-board-file-input" accept="image/*" hidden>
+            <button type="button" class="btn" id="wallpaper-board-upload-btn"><svg class="ic" width="15" height="15"><use href="#i-upload"/></svg>Choose image</button>
+            <span id="upload-board-filename">No file chosen</span>
+          </div>
+        </div>
+        <label class="field"><span>Or paste image URL</span>
+          <input id="custom-wallpaper-board-input" type="text" placeholder="https://..." autocomplete="off">
+        </label>
+        <div class="row-split">
+          <button class="btn primary" id="apply-wallpaper-board-btn">Apply to this board</button>
+          <button class="btn danger" id="remove-wallpaper-board-btn">Use global background</button>
+        </div>
       </div>
 
       <div class="m-panel" id="bg-fx">
-        <p class="hint">Reactive effects that follow your cursor. They work on top of scenes and wallpapers.</p>
+        <p class="hint">Reactive effects that follow your cursor. They work on top of scenes and wallpapers. Motion effects automatically turn off if your system has "reduce motion" enabled.</p>
         <div class="field"><span>Effect</span>
           <div id="fx-select">
             <button class="chip" data-fx="off">Off</button>
@@ -365,10 +446,31 @@ https://claude.ai"></textarea>
             <button class="chip" data-fx="particles">Particles</button>
             <button class="chip" data-fx="ripples">Ripples</button>
             <button class="chip" data-fx="trail">Trail</button>
-            <button class="chip" data-fx="constellation">Constellation</button>
+            <button class="chip" data-fx="orbit">Orbit</button>
+            <button class="chip" data-fx="sprite">Custom sprite</button>
           </div>
         </div>
         <label class="field range-field"><span>Intensity <em id="v-fxint">100%</em></span><input type="range" id="set-fxint" min="40" max="200" step="5"></label>
+
+        <div class="field"><span>Custom cursor sprite</span>
+          <div id="upload-sprite-area">
+            <input type="file" id="sprite-file-input" accept="image/*" hidden>
+            <button type="button" class="btn" id="sprite-upload-btn"><svg class="ic" width="15" height="15"><use href="#i-upload"/></svg>Choose image</button>
+            <span id="sprite-filename">No image uploaded</span>
+          </div>
+        </div>
+        <p class="hint">Upload a small image (like an emoji, icon or sticker) to have it follow your cursor when "Custom sprite" is selected.</p>
+
+        <hr style="border:none;border-top:1px solid var(--border);margin:10px 0">
+        <div class="field"><span>Custom cursor icon <em style="font-weight:400">(replaces your actual mouse pointer, everywhere)</em></span>
+          <label class="switch-row"><span>Use a custom cursor image</span><input type="checkbox" id="set-customcursor" class="switch"></label>
+        </div>
+        <div id="cursor-icon-upload-area">
+          <input type="file" id="cursor-icon-file-input" accept="image/*" hidden>
+          <button type="button" class="btn" id="cursor-icon-upload-btn"><svg class="ic" width="15" height="15"><use href="#i-upload"/></svg>Choose image</button>
+          <span id="cursor-icon-filename">No image uploaded</span>
+        </div>
+        <p class="hint">Works best with a small image (around 32×32) with a transparent background — it's resized automatically. This is different from "Custom sprite" above: this replaces the pointer itself, the sprite is an effect that follows it.</p>
       </div>
 
       <div class="modal-actions">
@@ -396,7 +498,7 @@ https://claude.ai"></textarea>
 
   <div id="toast"></div>
 
-  <script src="./newtab_files/newtab.js"></script>
-  <script src="./newtab_files/ai.js"></script>
+  <script src="./js/newtab.js"></script>
+  <script src="./js/ai.js"></script>
 </body>
 </html>
