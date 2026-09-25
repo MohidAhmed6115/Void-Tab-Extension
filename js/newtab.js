@@ -105,7 +105,8 @@ let state = {
   showDate: true,
   showGreeting: true,
   userName: '',
-  clockSize: 'm',
+  clockSize: 'm', // legacy (s/m/l) — migrated into clockCfg.size
+  clockCfg: null, // full clock customization, see js/clock.js
   clockPos: { x: 50, y: 40 },
   showSearch: true,
 };
@@ -647,41 +648,8 @@ const FX = {
 };
 
 // ---------- CLOCK / HERO ----------
-function greetingText() {
-  const h = new Date().getHours();
-  const g = h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 17 ? 'Good afternoon' : h >= 17 && h < 22 ? 'Good evening' : 'Good night';
-  const n = (state.userName || '').trim();
-  return n ? `${g}, ${n}` : g;
-}
-function tickClock() {
-  if (!state.showClock) return;
-  const d = new Date();
-  let h = d.getHours();
-  const m = String(d.getMinutes()).padStart(2, '0');
-  const s = String(d.getSeconds()).padStart(2, '0');
-  let ampm = '';
-  if (state.clock24) h = String(h).padStart(2, '0');
-  else { ampm = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; }
-  $('hero-hm').textContent = `${h}:${m}`;
-  $('hero-sec').textContent = state.showSeconds ? `:${s}` : '';
-  $('hero-ampm').textContent = ampm;
-  $('hero-date').textContent = d.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
-  $('hero-greeting').textContent = greetingText();
-}
-function renderHero() {
-  const hero = $('hero');
-  hero.dataset.size = state.clockSize || 'm';
-  hero.classList.toggle('no-clock', !state.showClock);
-  hero.classList.toggle('no-search', !state.showSearch);
-  hero.classList.toggle('hidden', !state.showClock && !state.showSearch);
-  $('hero-greeting').classList.toggle('hidden', !state.showGreeting);
-  $('hero-date').classList.toggle('hidden', !state.showDate);
-  const p = state.clockPos || DEFAULT_CLOCKPOS;
-  hero.style.left = p.x + '%';
-  hero.style.top = p.y + '%';
-  tickClock();
-}
-setInterval(tickClock, 1000);
+// The clock engine (styles, fonts, colors, time zones, settings UI) lives in js/clock.js.
+
 
 function looksLikeUrl(q) { return isUrlish(q); }
 function runSearch(q) {
@@ -1732,7 +1700,7 @@ function syncSettingsUI() {
   $('set-greeting').checked = !!state.showGreeting;
   $('set-name').value = state.userName || '';
   $('set-search').checked = !!state.showSearch;
-  setSeg('seg-clocksize', state.clockSize || 'm');
+  if (typeof syncClockUI === 'function') syncClockUI();
   const eff = state.cardEffect || 'transparent';
   document.querySelectorAll('.effect-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.effect === eff));
   syncAccentUI();
@@ -1752,13 +1720,12 @@ $('btn-settings').addEventListener('click', () => {
 });
 $('theme-select').addEventListener('change', () => { state.theme = $('theme-select').value; applyAppearance(); saveSoon(); });
 $('api-key-input').addEventListener('input', () => { state.apiKey = $('api-key-input').value.trim(); saveSoon(); });
-bindSwitch('set-clock', 'showClock', renderHero);
-bindSwitch('set-24h', 'clock24', renderHero);
-bindSwitch('set-seconds', 'showSeconds', renderHero);
-bindSwitch('set-date', 'showDate', renderHero);
-bindSwitch('set-greeting', 'showGreeting', renderHero);
-bindSwitch('set-search', 'showSearch', renderHero);
-bindSeg('seg-clocksize', 'clockSize', renderHero);
+bindSwitch('set-clock', 'showClock', () => renderHero());
+bindSwitch('set-24h', 'clock24', () => renderHero());
+bindSwitch('set-seconds', 'showSeconds', () => renderHero());
+bindSwitch('set-date', 'showDate', () => renderHero());
+bindSwitch('set-greeting', 'showGreeting', () => renderHero());
+bindSwitch('set-search', 'showSearch', () => renderHero());
 $('set-name').addEventListener('input', () => { state.userName = $('set-name').value; saveSoon(); tickClock(); });
 $('reset-clock-pos').addEventListener('click', () => { state.clockPos = { ...DEFAULT_CLOCKPOS }; save(); renderHero(); });
 $('save-settings-btn').addEventListener('click', () => save());

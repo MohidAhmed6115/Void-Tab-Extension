@@ -63,10 +63,13 @@
   </header>
 
   <!-- Clock / greeting / search -->
-  <div id="hero" data-size="m">
-    <div id="hero-greeting"></div>
-    <div id="hero-time"><span id="hero-hm"></span><span id="hero-sec"></span><span id="hero-ampm"></span></div>
-    <div id="hero-date"></div>
+  <div id="hero" data-align="center">
+    <div id="hero-clock">
+      <div id="hero-greeting"></div>
+      <div id="hero-face"></div>
+      <div id="hero-date"></div>
+      <div id="hero-world"></div>
+    </div>
     <div id="hero-search">
       <svg class="ic" width="17" height="17"><use href="#i-search"/></svg>
       <input id="hero-search-input" type="text" placeholder="Search the web or type a URL" autocomplete="off" spellcheck="false">
@@ -313,24 +316,96 @@ https://claude.ai"></textarea>
       </div>
 
       <div class="m-panel" id="s-clock">
+        <div class="field"><span>Presets</span><div id="ck-presets" class="chip-row"></div></div>
+        <div class="seg wrap" id="ck-tabs">
+          <button data-val="style" class="active">Style</button><button data-val="text">Text</button><button data-val="color">Color &amp; FX</button><button data-val="time">Time &amp; Date</button>
+        </div>
+        <div class="ck-sec active" data-sec="style">
+        <div class="field"><span>Clock style</span><div class="seg wrap" data-ck="style"><button data-val="digital">Digital</button><button data-val="stacked">Stacked</button><button data-val="analog">Analog</button><button data-val="flip">Flip</button><button data-val="word">Words</button><button data-val="ring">Ring</button></div></div>
+        <label class="field range-field"><span>Size <em data-ckv="size" data-unit="px"></em></span><input type="range" data-ck="size" min="40" max="320" step="2"></label>
+        <div class="field"><span>Alignment</span><div class="seg" data-ck="align"><button data-val="left">Left</button><button data-val="center">Center</button><button data-val="right">Right</button></div></div>
+        <label class="switch-row" data-if="style=digital,ring"><span>Blinking colon</span><input type="checkbox" class="switch" data-ck="blinkColon"></label>
+        <div class="field" data-if="style=digital,ring"><span>Seconds size</span><div class="seg" data-ck="secStyle"><button data-val="small">Small</button><button data-val="same">Same as time</button></div></div>
+        <label class="switch-row" data-if="style=digital,stacked,flip,ring"><span>Show AM / PM</span><input type="checkbox" class="switch" data-ck="showAmPm"></label>
+        <label class="switch-row" data-if="style=digital,stacked,ring"><span>Leading zero in 12-hour time</span><input type="checkbox" class="switch" data-ck="leadingZero"></label>
+        <div class="field" data-if="style=analog"><span>Face</span><div class="seg wrap" data-ck="aFace"><button data-val="ticks">Ticks</button><button data-val="numerals">Numbers</button><button data-val="roman">Roman</button><button data-val="dots">Dots</button><button data-val="minimal">Minimal</button><button data-val="none">None</button></div></div>
+        <div class="field" data-if="style=analog"><span>Hands</span><div class="seg" data-ck="aHands"><button data-val="thin">Thin</button><button data-val="bold">Bold</button><button data-val="rounded">Rounded</button><button data-val="arrow">Arrow</button></div></div>
+        <label class="field range-field" data-if="style=analog"><span>Border <em data-ckv="aBorder" data-unit="px"></em></span><input type="range" data-ck="aBorder" min="0" max="8" step="0.5"></label>
+        <label class="field range-field" data-if="style=analog"><span>Face fill <em data-ckv="aBg" data-unit="%"></em></span><input type="range" data-ck="aBg" min="0" max="100" step="5"></label>
+        <label class="switch-row" data-if="style=analog"><span>Smooth sweeping second hand</span><input type="checkbox" class="switch" data-ck="aSmooth"></label>
+        <p class="hint" data-if="style=analog">Second hand shows when "Show seconds" is on (Time &amp; Date tab).</p>
+        <div class="field" data-if="style=flip"><span>Card look</span><div class="seg" data-ck="flipCard"><button data-val="glass">Glass</button><button data-val="dark">Dark</button><button data-val="light">Light</button><button data-val="accent">Accent</button></div></div>
+        <div class="field" data-if="style=ring"><span>Ring tracks</span><div class="seg" data-ck="ringMode"><button data-val="seconds">Seconds</button><button data-val="minutes">Minutes</button><button data-val="day">Day progress</button></div></div>
+        <label class="field range-field" data-if="style=ring"><span>Ring thickness <em data-ckv="ringWidth" data-unit=""></em></span><input type="range" data-ck="ringWidth" min="1" max="12" step="0.5"></label>
+        </div>
+        <div class="ck-sec" data-sec="text">
+        <label class="field"><span>Font</span>
+          <select data-ck="font" id="ck-font-select"></select>
+        </label>
+        <label class="field"><span>Custom font name (optional)</span><input type="text" data-ck="fontCustom" placeholder="Any font installed on your device, e.g. Impact" autocomplete="off" spellcheck="false"></label>
+        <label class="field range-field"><span>Weight <em data-ckv="weight" data-unit=""></em></span><input type="range" data-ck="weight" min="100" max="900" step="100"></label>
+        <label class="field range-field"><span>Letter spacing <em data-ckv="spacing" data-unit=""></em></span><input type="range" data-ck="spacing" min="-10" max="40" step="1"></label>
+        <label class="switch-row"><span>UPPERCASE date, greeting &amp; words</span><input type="checkbox" class="switch" data-ck="uppercase"></label>
+        <label class="field range-field"><span>Greeting size <em data-ckv="greetingSize" data-unit="px"></em></span><input type="range" data-ck="greetingSize" min="10" max="48" step="1"></label>
+        <label class="field range-field"><span>Date size <em data-ckv="dateSize" data-unit="px"></em></span><input type="range" data-ck="dateSize" min="10" max="48" step="1"></label>
+        <div class="field"><span>Greeting text</span><div class="seg" data-ck="greetingMode"><button data-val="auto">Automatic</button><button data-val="custom">Custom</button></div></div>
+        <label class="field" data-if="greetingMode=custom"><span>Custom greeting</span><input type="text" data-ck="greetingText" placeholder="Hello, {name}" autocomplete="off" spellcheck="false"></label>
+        <p class="hint" data-if="greetingMode=custom">Use {name} for your name and {greeting} for Good morning / afternoon / evening.</p>
+        </div>
+        <div class="ck-sec" data-sec="color">
+        <div class="field"><span>Clock color</span><div class="seg" data-ck="colorMode"><button data-val="default">Theme</button><button data-val="accent">Accent</button><button data-val="solid">Solid</button><button data-val="gradient">Gradient</button></div></div>
+        <label class="field" data-if="colorMode=solid,gradient"><span>Color</span><input type="color" data-ck="color"></label>
+        <label class="field" data-if="colorMode=gradient"><span>Second color</span><input type="color" data-ck="color2"></label>
+        <label class="field range-field" data-if="colorMode=gradient"><span>Gradient angle <em data-ckv="gradAngle" data-unit="°"></em></span><input type="range" data-ck="gradAngle" min="0" max="360" step="5"></label>
+        <label class="switch-row"><span>Apply color to greeting &amp; date too</span><input type="checkbox" class="switch" data-ck="tintText"></label>
+        <label class="field range-field"><span>Opacity <em data-ckv="opacity" data-unit="%"></em></span><input type="range" data-ck="opacity" min="20" max="100" step="5"></label>
+        <label class="field range-field"><span>Glow <em data-ckv="glow" data-unit="%"></em></span><input type="range" data-ck="glow" min="0" max="100" step="5"></label>
+        <div class="field" data-if="glow!=0"><span>Glow color</span><div class="seg" data-ck="glowMode"><button data-val="accent">Accent</button><button data-val="text">Match clock</button><button data-val="custom">Custom</button></div></div>
+        <label class="field" data-if="glowMode=custom;glow!=0"><span>Custom glow color</span><input type="color" data-ck="glowColor"></label>
+        <label class="switch-row" data-if="style=digital,stacked,word"><span>Outline only (hollow text)</span><input type="checkbox" class="switch" data-ck="outline"></label>
+        <label class="field range-field" data-if="style=digital,stacked,word;outline=true"><span>Outline thickness <em data-ckv="outlineW" data-unit="px"></em></span><input type="range" data-ck="outlineW" min="1" max="6" step="0.5"></label>
+        <label class="switch-row"><span>Glass panel behind the clock</span><input type="checkbox" class="switch" data-ck="panel"></label>
+        <label class="field range-field" data-if="panel=true"><span>Panel padding <em data-ckv="panelPad" data-unit="px"></em></span><input type="range" data-ck="panelPad" min="6" max="64" step="2"></label>
+        <label class="field range-field" data-if="panel=true"><span>Panel roundness <em data-ckv="panelRadius" data-unit="px"></em></span><input type="range" data-ck="panelRadius" min="0" max="64" step="2"></label>
+        </div>
+        <div class="ck-sec" data-sec="time">
         <label class="switch-row"><span>Show clock</span><input type="checkbox" class="switch" id="set-clock"></label>
         <label class="switch-row"><span>24-hour time</span><input type="checkbox" class="switch" id="set-24h"></label>
         <label class="switch-row"><span>Show seconds</span><input type="checkbox" class="switch" id="set-seconds"></label>
         <label class="switch-row"><span>Show date</span><input type="checkbox" class="switch" id="set-date"></label>
+        <label class="field" data-if="showDate=true"><span>Date format</span>
+          <select data-ck="dateFormat">
+            <option value="long">Monday, 5 June</option>
+            <option value="short">Mon, Jun 5</option>
+            <option value="full">Monday, 5 June 2026</option>
+            <option value="numeric">05/06/2026 (locale)</option>
+            <option value="iso">2026-06-05</option>
+            <option value="custom">Custom pattern…</option>
+          </select>
+        </label>
+        <label class="field" data-if="dateFormat=custom;showDate=true"><span>Custom date pattern</span><input type="text" data-ck="dateCustom" placeholder="dddd, D MMMM YYYY" autocomplete="off" spellcheck="false"></label>
+        <p class="hint" data-if="dateFormat=custom;showDate=true">Tokens: YYYY YY · MMMM MMM MM M · dddd ddd · DD D Do · HH H hh h · mm ss · A a. Wrap literal text in [brackets].</p>
+        <label class="field"><span>Time zone</span><input type="text" data-ck="tz" placeholder="Local (leave empty) — or e.g. Asia/Tokyo" autocomplete="off" spellcheck="false" list="ck-tz-list"></label>
+        <label class="switch-row" data-if="showDate=true"><span>Show time zone name next to the date</span><input type="checkbox" class="switch" data-ck="showTz"></label>
+        <label class="field"><span>Extra world clocks</span>
+          <textarea data-ck="worldClocks" placeholder="Tokyo|Asia/Tokyo&#10;London|Europe/London&#10;New York|America/New_York" spellcheck="false"></textarea>
+        </label>
+        <p class="hint">One per line as <b>Label|Zone</b> (or just the zone). Small clocks appear under the date.</p>
         <label class="switch-row"><span>Show greeting</span><input type="checkbox" class="switch" id="set-greeting"></label>
         <label class="field"><span>Your name (for the greeting)</span>
           <input id="set-name" type="text" placeholder="Optional" autocomplete="off" maxlength="30">
         </label>
-        <div class="field"><span>Clock size</span>
-          <div class="seg" id="seg-clocksize">
-            <button data-val="s">Small</button><button data-val="m">Medium</button><button data-val="l">Large</button>
-          </div>
-        </div>
         <label class="switch-row"><span>Show search bar</span><input type="checkbox" class="switch" id="set-search"></label>
         <div class="row-split">
           <p class="hint">Turn on Edit layout (pencil) to drag the clock anywhere.</p>
           <button class="btn" id="reset-clock-pos">Reset position</button>
         </div>
+        </div>
+        <div class="row-split">
+          <p class="hint">Changes apply live — the settings window docks to the side so you can watch the clock.</p>
+          <button class="btn" id="ck-reset">Reset clock style</button>
+        </div>
+        <datalist id="ck-tz-list"></datalist>
       </div>
 
       <div class="m-panel" id="s-cards">
@@ -499,6 +574,7 @@ https://claude.ai"></textarea>
   <div id="toast"></div>
 
   <script src="./js/newtab.js"></script>
+  <script src="./js/clock.js"></script>
   <script src="./js/ai.js"></script>
 </body>
 </html>
