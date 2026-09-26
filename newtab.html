@@ -170,12 +170,15 @@
       </div>
 
       <div class="m-panel active" id="io-import">
-        <p class="hint">One bookmark per block: name on the first line, link on the second, then an empty line. A plain list of links works too.</p>
-        <textarea id="io-text" spellcheck="false" placeholder="GitHub
+        <p class="hint" id="io-format-hint">Paste a plain list (name, then link, then a blank line) or a full export with <code># Board</code> and <code>## Group</code> headers — boards and groups will be created automatically and matched by name if they already exist.</p>
+        <div class="io-editor">
+          <pre class="io-highlight" id="io-text-hl" aria-hidden="true"></pre>
+          <textarea id="io-text" class="io-code" spellcheck="false" placeholder="GitHub
 https://github.com
 
 Claude
 https://claude.ai"></textarea>
+        </div>
         <div class="row-split">
           <button class="btn" id="io-file-btn"><svg class="ic" width="15" height="15"><use href="#i-upload"/></svg>Load .txt file</button>
           <input type="file" id="io-file" accept=".txt,text/plain" hidden>
@@ -196,7 +199,11 @@ https://claude.ai"></textarea>
 
       <div class="m-panel" id="io-export">
         <p class="hint" id="io-export-count"></p>
-        <textarea id="io-export-text" readonly spellcheck="false"></textarea>
+        <div class="io-editor">
+          <pre class="io-highlight" id="io-export-hl" aria-hidden="true"></pre>
+          <textarea id="io-export-text" class="io-code" spellcheck="false"></textarea>
+        </div>
+        <p class="hint">You can edit this before copying or downloading — matching board <code># </code>and group <code>## </code>headers keeps everything in place when you re-import it.</p>
         <div class="modal-actions">
           <button class="btn modal-close-btn">Close</button>
           <button class="btn" id="io-copy-btn"><svg class="ic" width="15" height="15"><use href="#i-copy"/></svg>Copy</button>

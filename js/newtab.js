@@ -1428,15 +1428,70 @@ $('search-input').addEventListener('keydown', (e) => {
 });
 
 // ---------- IMPORT / EXPORT ----------
+// ---------- IO editor: syntax highlighting overlay for the import/export textareas ----------
+// Colors board/group headers, URLs and titles so it reads like a little outline editor.
+// Classification looks at the trimmed line, but every character of the ORIGINAL line is kept
+// (just wrapped in a span) so the invisible real textarea text lines up pixel-for-pixel.
+function ioEscape(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function ioHighlightLine(line) {
+  if (!line.trim()) return '';
+  let m;
+  if ((m = line.match(/^(\s*)##(\s+)(.*)$/))) {
+    const lead = m[1], gap = m[2]; let rest = m[3], suffix = '', accent = '';
+    const am = rest.match(/(\s*\((#[0-9a-fA-F]{3,8})\)\s*)$/);
+    if (am) { accent = am[2]; suffix = am[1]; rest = rest.slice(0, rest.length - am[1].length); }
+    const style = accent ? ` style="color:${accent}"` : '';
+    return `${ioEscape(lead)}<span class="io-h-mark">##${ioEscape(gap)}</span><span class="io-h-group"${style}>${ioEscape(rest)}</span>` + (suffix ? `<span class="io-h-mark">${ioEscape(suffix)}</span>` : '');
+  }
+  if ((m = line.match(/^(\s*)#(\s+)(.*)$/))) {
+    return `${ioEscape(m[1])}<span class="io-h-mark">#${ioEscape(m[2])}</span><span class="io-h-board">${ioEscape(m[3])}</span>`;
+  }
+  const t = line.trim();
+  if (t === '_(no groups)_' || t === '_(empty group)_') return `<span class="io-h-muted">${ioEscape(line)}</span>`;
+  if (isUrlish(t)) return `<span class="io-h-url">${ioEscape(line)}</span>`;
+  return `<span class="io-h-title">${ioEscape(line)}</span>`;
+}
+function ioHighlight(text) {
+  return String(text || '').replace(/\r\n?/g, '\n').split('\n').map(ioHighlightLine).join('\n');
+}
+function ioSync(taId, hlId) {
+  const ta = $(taId), hl = $(hlId);
+  hl.innerHTML = ioHighlight(ta.value);
+  hl.scrollTop = ta.scrollTop;
+}
+function ioWireEditor(taId, hlId) {
+  const ta = $(taId);
+  ta.addEventListener('scroll', () => { $(hlId).scrollTop = ta.scrollTop; });
+}
+ioWireEditor('io-text', 'io-text-hl');
+ioWireEditor('io-export-text', 'io-export-hl');
+
 function allBookmarks() {
   const out = [];
   state.boards.forEach(b => b.groups.forEach(g => g.bookmarks.forEach(bk => out.push(bk))));
   return out;
 }
+// Full backup format: "# Board" headers, "## [icon] Group (accent)" headers, then
+// name/link pairs. Still just plain text — headers are the only thing added versus
+// the old flat format, so hand-editing or pasting a plain link list still works.
 function buildExportText() {
-  const list = allBookmarks();
-  if (!list.length) return '';
-  return list.map(b => `${String(b.title).replace(/\s*[\r\n]+\s*/g, ' ').trim()}\n${b.url}`).join('\n\n') + '\n';
+  if (!state.boards.length) return '';
+  const blocks = [];
+  state.boards.forEach(b => {
+    blocks.push(`# ${b.name}`);
+    if (!b.groups.length) { blocks.push('_(no groups)_'); return; }
+    b.groups.forEach(g => {
+      let head = `## ${g.icon ? g.icon + ' ' : ''}${g.name}`.trim();
+      if (g.accent) head += ` (${g.accent})`;
+      blocks.push(head);
+      if (!g.bookmarks.length) { blocks.push('_(empty group)_'); return; }
+      g.bookmarks.forEach(bk => {
+        const title = String(bk.title || '').replace(/\s*[\r\n]+\s*/g, ' ').trim() || suggestTitle(bk.url);
+        blocks.push(`${title}\n${bk.url}`);
+      });
+    });
+  });
+  return blocks.join('\n\n') + '\n';
 }
 
 // Format: name / link / empty line, repeated. Also accepts a plain list of links.
@@ -1471,6 +1526,83 @@ function parseBookmarkText(text) {
   return { items, skipped };
 }
 
+// Detects the full "# Board / ## Group" backup format so a plain link list (or an old-style
+// export from before boards/groups were included) still falls back to parseBookmarkText above.
+function isStructuredImport(text) {
+  return /^#{1,2}[ \t]+\S/m.test(String(text || ''));
+}
+// Parses the "# Board / ## [icon] Group (accent)" format into { boards: [{name, groups:[{name,icon,accent,items:[{title,url}]}]}], skipped }.
+function parseStructuredText(text) {
+  const lines = String(text || '').replace(/\r\n?/g, '\n').split('\n');
+  const boards = [];
+  let curBoard = null, curGroup = null, pendingTitle = null, skipped = 0;
+  const ensureBoard = (name) => { curBoard = { name: (name || '').trim() || 'Imported', groups: [] }; boards.push(curBoard); curGroup = null; };
+  const ensureGroup = (name, icon, accent) => {
+    if (!curBoard) ensureBoard('Imported');
+    curGroup = { name: (name || '').trim() || 'Imported', icon: icon || '', accent: accent || '', items: [] };
+    curBoard.groups.push(curGroup);
+  };
+  const pushItem = (title, urlRaw) => {
+    const url = normalizeUrl(urlRaw);
+    if (!url) { skipped++; pendingTitle = null; return; }
+    if (!curGroup) ensureGroup('Imported');
+    curGroup.items.push({ title: (title || '').trim() || suggestTitle(url), url });
+    pendingTitle = null;
+  };
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line || line === '_(no groups)_' || line === '_(empty group)_') continue;
+    let m;
+    if ((m = line.match(/^##[ \t]+(.+)$/))) {
+      let rest = m[1].trim(), accent = '';
+      const am = rest.match(/\((#[0-9a-fA-F]{3,8})\)\s*$/);
+      if (am) { accent = am[1]; rest = rest.slice(0, am.index).trim(); }
+      let icon = '';
+      try {
+        const im = rest.match(/^(\p{Extended_Pictographic}\uFE0F?)[ \t]+(.+)$/u);
+        if (im) { icon = im[1]; rest = im[2].trim(); }
+      } catch (e) { /* older engines without \p{} support just skip icon extraction */ }
+      ensureGroup(rest, icon, accent);
+      pendingTitle = null;
+      continue;
+    }
+    if ((m = line.match(/^#[ \t]+(.+)$/))) { ensureBoard(m[1].trim()); pendingTitle = null; continue; }
+    if (isUrlish(line)) { pushItem(pendingTitle, line); }
+    else { if (pendingTitle !== null) skipped++; pendingTitle = line; }
+  }
+  return { boards, skipped };
+}
+function findOrCreateBoardByName(name) {
+  name = (name || 'Imported').trim() || 'Imported';
+  let b = state.boards.find(x => x.name.toLowerCase() === name.toLowerCase());
+  if (!b) { b = { id: boardId(), name, groups: [] }; state.boards.push(b); }
+  return b;
+}
+function findOrCreateGroupFull(board, name, icon, accent) {
+  name = (name || 'Imported').trim() || 'Imported';
+  let g = board.groups.find(x => x.name.toLowerCase() === name.toLowerCase());
+  if (!g) { g = { id: groupId(), name, icon: icon || '', accent: accent || '', bookmarks: [] }; board.groups.push(g); }
+  return g;
+}
+// Imports a full { boards } tree from parseStructuredText, matching existing boards/groups
+// by name (case-insensitive) and creating whatever doesn't exist yet.
+function importStructured(plan, skipDup) {
+  let added = 0, dup = 0, boardsTouched = 0, groupsTouched = 0, firstBoard = null;
+  plan.boards.forEach(pb => {
+    const board = findOrCreateBoardByName(pb.name);
+    if (!firstBoard) firstBoard = board;
+    boardsTouched++;
+    pb.groups.forEach(pg => {
+      const group = findOrCreateGroupFull(board, pg.name, pg.icon, pg.accent);
+      groupsTouched++;
+      if (!pg.items.length) return;
+      const r = addItems(group, pg.items, skipDup);
+      added += r.added; dup += r.dup;
+    });
+  });
+  return { added, dup, boardsTouched, groupsTouched, firstBoard };
+}
+
 let ioPlan = null; // AI-sorted plan: [{title,url,group}]
 function resetImportPlan() {
   ioPlan = null;
@@ -1498,12 +1630,25 @@ function syncNewGroupInput() {
   if (isNew && !$('io-newgroup').value) $('io-newgroup').value = 'Imported';
 }
 function updateImportStatus() {
-  const { items, skipped } = parseBookmarkText($('io-text').value);
+  const text = $('io-text').value;
+  ioSync('io-text', 'io-text-hl');
   const st = $('io-status');
-  if (!$('io-text').value.trim()) { st.textContent = ''; }
-  else st.textContent = `${items.length} bookmark${items.length === 1 ? '' : 's'} found` + (skipped ? `, ${skipped} line${skipped === 1 ? '' : 's'} ignored` : '');
-  $('io-import-btn').disabled = !items.length && !ioPlan;
-  $('io-ai-btn').disabled = !items.length;
+  if (!text.trim()) { st.textContent = ''; $('io-dest-field').classList.remove('hidden'); $('io-import-btn').disabled = !ioPlan; $('io-ai-btn').disabled = true; return; }
+  if (isStructuredImport(text)) {
+    const { boards, skipped } = parseStructuredText(text);
+    const groups = boards.reduce((s, b) => s + b.groups.length, 0);
+    const items = boards.reduce((s, b) => s + b.groups.reduce((s2, g) => s2 + g.items.length, 0), 0);
+    st.textContent = `Structured import — ${items} bookmark${items === 1 ? '' : 's'} in ${groups} group${groups === 1 ? '' : 's'} across ${boards.length} board${boards.length === 1 ? '' : 's'}, placed automatically` + (skipped ? `, ${skipped} line${skipped === 1 ? '' : 's'} ignored` : '') + '.';
+    $('io-dest-field').classList.add('hidden');
+    $('io-import-btn').disabled = !items;
+    $('io-ai-btn').disabled = true; // sorting into an existing board/group layout doesn't apply here
+  } else {
+    const { items, skipped } = parseBookmarkText(text);
+    st.textContent = `${items.length} bookmark${items.length === 1 ? '' : 's'} found` + (skipped ? `, ${skipped} line${skipped === 1 ? '' : 's'} ignored` : '');
+    $('io-dest-field').classList.remove('hidden');
+    $('io-import-btn').disabled = !items.length && !ioPlan;
+    $('io-ai-btn').disabled = !items.length;
+  }
 }
 $('btn-bulk-import').addEventListener('click', () => {
   fillDestSelect();
@@ -1546,6 +1691,7 @@ function addItems(group, items, skipDup) {
 $('io-import-btn').addEventListener('click', () => {
   const skipDup = $('io-skipdup').checked;
   let added = 0, dup = 0, targetBoard = currentBoard();
+  const text = $('io-text').value;
   if (ioPlan) {
     const byGroup = {};
     ioPlan.forEach(p => (byGroup[p.group] = byGroup[p.group] || []).push(p));
@@ -1553,15 +1699,30 @@ $('io-import-btn').addEventListener('click', () => {
       const r = addItems(findOrCreateGroup(targetBoard, name), items, skipDup);
       added += r.added; dup += r.dup;
     });
-  } else {
-    const { items } = parseBookmarkText($('io-text').value);
-    if (!items.length) { toast('No bookmarks found in the text'); return; }
-    const [bid, gid] = $('io-dest').value.split('|');
-    targetBoard = state.boards.find(b => b.id === bid) || currentBoard();
-    const group = gid === '__new__' ? findOrCreateGroup(targetBoard, $('io-newgroup').value.trim() || 'Imported') : targetBoard.groups.find(g => g.id === gid);
-    if (!group) return;
-    ({ added, dup } = addItems(group, items, skipDup));
+    state.currentBoardId = targetBoard.id;
+    save(); render();
+    closeModal('bulk-modal');
+    toast(`Imported ${added} bookmark${added === 1 ? '' : 's'}` + (dup ? `, skipped ${dup} duplicate${dup === 1 ? '' : 's'}` : ''));
+    return;
   }
+  if (isStructuredImport(text)) {
+    const plan = parseStructuredText(text);
+    if (!plan.boards.length) { toast('No boards found in the text'); return; }
+    const r = importStructured(plan, skipDup);
+    added = r.added; dup = r.dup;
+    if (r.firstBoard) state.currentBoardId = r.firstBoard.id;
+    save(); render();
+    closeModal('bulk-modal');
+    toast(`Imported ${added} bookmark${added === 1 ? '' : 's'} into ${r.groupsTouched} group${r.groupsTouched === 1 ? '' : 's'} across ${r.boardsTouched} board${r.boardsTouched === 1 ? '' : 's'}` + (dup ? `, skipped ${dup} duplicate${dup === 1 ? '' : 's'}` : ''));
+    return;
+  }
+  const { items } = parseBookmarkText(text);
+  if (!items.length) { toast('No bookmarks found in the text'); return; }
+  const [bid, gid] = $('io-dest').value.split('|');
+  targetBoard = state.boards.find(b => b.id === bid) || currentBoard();
+  const group = gid === '__new__' ? findOrCreateGroup(targetBoard, $('io-newgroup').value.trim() || 'Imported') : targetBoard.groups.find(g => g.id === gid);
+  if (!group) return;
+  ({ added, dup } = addItems(group, items, skipDup));
   state.currentBoardId = targetBoard.id;
   save(); render();
   closeModal('bulk-modal');
@@ -1595,15 +1756,18 @@ $('io-ai-btn').addEventListener('click', async () => {
 function refreshExport() {
   const text = buildExportText();
   const n = allBookmarks().length;
+  const groups = state.boards.reduce((s, b) => s + b.groups.length, 0);
   $('io-export-text').value = text;
-  $('io-export-count').textContent = n
-    ? `${n} bookmark${n === 1 ? '' : 's'} from ${state.boards.length} board${state.boards.length === 1 ? '' : 's'}. Each entry is a name, a link, and an empty line.`
-    : 'There are no bookmarks to export yet.';
-  $('io-download-btn').disabled = $('io-copy-btn').disabled = !n;
+  ioSync('io-export-text', 'io-export-hl');
+  $('io-export-count').textContent = state.boards.length
+    ? `${n} bookmark${n === 1 ? '' : 's'} in ${groups} group${groups === 1 ? '' : 's'} across ${state.boards.length} board${state.boards.length === 1 ? '' : 's'}. Board and group headers are included, so importing this file rebuilds the same layout.`
+    : 'There is nothing to export yet.';
+  $('io-download-btn').disabled = $('io-copy-btn').disabled = !state.boards.length;
 }
+$('io-export-text').addEventListener('input', () => ioSync('io-export-text', 'io-export-hl'));
 $('io-download-btn').addEventListener('click', () => {
-  const text = buildExportText();
-  if (!text) return;
+  const text = $('io-export-text').value; // read live — the person may have edited it by hand
+  if (!text.trim()) return;
   const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
   const a = document.createElement('a');
   const d = new Date();
@@ -1615,8 +1779,9 @@ $('io-download-btn').addEventListener('click', () => {
   toast('Bookmarks exported');
 });
 $('io-copy-btn').addEventListener('click', () => {
-  navigator.clipboard.writeText(buildExportText()).then(() => toast('Copied to clipboard'), () => toast('Could not copy'));
+  navigator.clipboard.writeText($('io-export-text').value).then(() => toast('Copied to clipboard'), () => toast('Could not copy'));
 });
+
 
 // ---------- INCOGNITO ----------
 $('btn-incognito').addEventListener('click', async () => {

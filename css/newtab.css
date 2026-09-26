@@ -550,7 +550,7 @@ body.intro .group-card { animation: cardIn 0.55s cubic-bezier(0.2,0.7,0.2,1) bot
   scrollbar-width: thin; scrollbar-color: var(--border) transparent;
   animation: popIn 0.22s cubic-bezier(0.2,0.8,0.2,1);
 }
-.modal-box.wide { max-width: 560px; }
+.modal-box.wide { max-width: 640px; }
 @keyframes popIn { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: none; } }
 .modal-box h3 { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--text-primary); }
 .modal-box p { font-size: 13px; color: var(--text-secondary); }
@@ -569,6 +569,38 @@ body.intro .group-card { animation: cardIn 0.55s cubic-bezier(0.2,0.7,0.2,1) bot
 }
 .modal-box input:focus, .modal-box textarea:focus, .modal-box select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 .modal-box textarea { min-height: 140px; resize: vertical; font-family: ui-monospace, Consolas, monospace; font-size: 12px; line-height: 1.55; }
+
+/* ---- import/export syntax-highlighted editor ----
+   A transparent textarea sits on top of a <pre> that mirrors its text with colored
+   spans, so it reads like a little editor while staying a plain, fully-editable textarea
+   underneath. Both layers share the exact same font/padding/border box so the invisible
+   real text lines up perfectly with the highlighted copy behind it. */
+.io-editor { position: relative; height: 260px; }
+.io-editor .io-code,
+.io-editor .io-highlight {
+  position: absolute; inset: 0; margin: 0;
+  box-sizing: border-box; width: 100%; height: 100%;
+  padding: 9px 12px; border: 1px solid transparent; border-radius: 9px;
+  font-family: ui-monospace, Consolas, monospace; font-size: 12px; line-height: 1.55;
+  white-space: pre-wrap; word-wrap: break-word; overflow-y: auto; overflow-x: hidden;
+}
+.io-editor .io-highlight {
+  z-index: 1; color: var(--text-primary); background: rgba(255,255,255,0.06); border-color: var(--border);
+  pointer-events: none; scrollbar-width: none;
+}
+.io-editor .io-highlight::-webkit-scrollbar { display: none; }
+.io-editor .io-code {
+  z-index: 2; resize: none; background: transparent; border-color: transparent;
+  color: transparent; caret-color: var(--text-primary);
+}
+.io-editor .io-code:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.io-editor .io-highlight:has(+ .io-code:focus) { border-color: var(--accent); }
+.io-h-mark  { color: var(--text-muted); opacity: 0.55; }
+.io-h-board { color: var(--accent); }
+.io-h-group { color: #7dd3fc; }
+.io-h-url   { color: #34d399; }
+.io-h-title { color: var(--text-primary); }
+.io-h-muted { color: var(--text-muted); opacity: 0.6; }
 .modal-box select { appearance: none; -webkit-appearance: none; cursor: pointer;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
   background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
